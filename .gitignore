@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+ai-infra-book/
+.DS_Store
