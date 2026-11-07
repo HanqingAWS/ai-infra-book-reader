@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深入理解 AI Infra · 原文 + 小龙虾解读</title>
+<style>/*KATEX_CSS*/</style>
+<style>
+:root{
+  --bg:#fbfaf7; --panel:#f3f1ec; --text:#1f2328; --muted:#6a6f76; --line:#e3e0d8;
+  --accent:#c2410c; --link:#0b63c5;
+  --note-bg:#fff4e8; --note-line:#f59e0b; --note-text:#3a2a12; --note-head:#b45309;
+  --code:#f0eee8; --shadow:0 1px 2px rgba(0,0,0,.05);
+  --fs:17px;
+}
+html.dark{
+  --bg:#16181c; --panel:#1d2025; --text:#e6e6e6; --muted:#9aa0a6; --line:#2c3036;
+  --accent:#fb923c; --link:#6cb6ff;
+  --note-bg:#2a2218; --note-line:#d97706; --note-text:#f1e4cf; --note-head:#fbbf24;
+  --code:#23262c; --shadow:none;
+}
+html.green{
+  --bg:#e0f2e3; --panel:#d2ead6; --text:#1d2b1f; --muted:#4d6151; --line:#bddcc2;
+  --accent:#b45309; --link:#0a5aa8;
+  --note-bg:#f7f0d9; --note-line:#e8930c; --note-text:#3a2a12; --note-head:#a3480b;
+  --code:#cbe5cf; --shadow:none;
+}
+mark.key{background:none;color:inherit;text-decoration:underline;text-decoration-color:#f5a00b;
+  text-decoration-thickness:3px;text-underline-offset:5px;text-decoration-skip-ink:none}
+html.dark mark.key{text-decoration-color:#f59e0b}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:var(--fs)/1.85 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+
+/* 顶栏 */
+.topbar{position:fixed;inset:0 0 auto 0;height:52px;z-index:20;display:flex;align-items:center;gap:10px;
+  padding:0 14px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line)}
+.topbar .title{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.topbar .title small{color:var(--muted);font-weight:400;margin-left:6px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;
+  height:32px;padding:0 10px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;user-select:none;
+  border:1px solid var(--line);background:var(--panel);border-radius:8px;height:32px;padding:0 10px}
+.switch .track{width:34px;height:20px;border-radius:10px;background:#c9c6be;position:relative;transition:background .2s}
+.switch .track::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
+.switch[aria-checked="true"] .track{background:var(--note-line)}
+.switch[aria-checked="true"] .track::after{transform:translateX(14px)}
+#menuBtn{display:none}
+.progress{position:fixed;top:52px;left:0;height:2px;background:var(--accent);width:0;z-index:21;transition:width .1s}
+
+/* 目录 */
+.sidebar{position:fixed;top:52px;bottom:0;left:0;width:290px;overflow:auto;padding:18px 12px 40px 18px;
+  border-right:1px solid var(--line);background:var(--panel);font-size:14px;line-height:1.5}
+.sidebar ul{list-style:none;margin:0;padding:0}
+.sidebar ul ul{padding-left:12px}
+.sidebar a{display:block;padding:4px 8px;border-radius:6px;color:var(--muted)}
+.sidebar a[data-level="1"]{color:var(--text);font-weight:600;margin-top:10px}
+.sidebar a[data-level="2"]{color:var(--text)}
+.sidebar a.active{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);text-decoration:none}
+.sidebar .side-foot{margin-top:24px;padding:12px 8px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+
+/* 正文 */
+main{margin-left:290px;padding:76px 32px 120px}
+.content{max-width:780px;margin:0 auto}
+.chapter + .chapter{margin-top:80px;padding-top:40px;border-top:2px dashed var(--line)}
+h1{font-size:2em;line-height:1.3;margin:.2em 0 .6em}
+h2{font-size:1.45em;line-height:1.4;margin:2.2em 0 .6em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:1.18em;margin:1.8em 0 .5em}
+p{margin:.8em 0}
+strong{color:color-mix(in srgb,var(--text) 92%,var(--accent))}
+img{display:block;max-width:100%;height:auto;margin:1.4em auto .4em;background:#fff;border-radius:8px;padding:8px;box-shadow:var(--shadow)}
+p > em:only-child{display:block;font-size:.88em;color:var(--muted);font-style:normal;text-align:center;margin-top:-.2em}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.9em;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top}
+th{background:var(--panel);text-align:left}
+code{background:var(--code);padding:.1em .35em;border-radius:4px;font-size:.88em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow:auto}
+pre code{background:none;padding:0}
+blockquote{margin:1.2em 0;padding:.6em 1em;border-left:4px solid var(--link);background:var(--panel);border-radius:0 8px 8px 0}
+blockquote p{margin:.4em 0}
+.math.display{overflow-x:auto;overflow-y:hidden;margin:1em 0;padding:.2em 0}
+.footnote{font-size:.85em;color:var(--muted);margin-top:3em}
+.footnote hr{border:0;border-top:1px solid var(--line)}
+sup a{font-size:.8em}
+
+/* 解读 */
+.note{margin:1.6em 0 2em;background:var(--note-bg);border:1px solid color-mix(in srgb,var(--note-line) 35%,transparent);
+  border-left:4px solid var(--note-line);border-radius:10px;color:var(--note-text);font-size:.95em;overflow:hidden}
+.note-head{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;cursor:pointer;font-weight:600;color:var(--note-head);font-size:14px}
+.note-head:focus-visible{outline:2px solid var(--note-line);outline-offset:-2px}
+.note-arrow{font-weight:400;font-size:12px;opacity:.8}
+.note-body{padding:0 16px 10px}
+.note-body p:first-child{margin-top:0}
+.note-body table{font-size:.92em}
+.note-body th{background:color-mix(in srgb,var(--note-line) 14%,transparent)}
+.note-body th,.note-body td{border-color:color-mix(in srgb,var(--note-line) 30%,transparent)}
+.note.collapsed .note-body{display:none}
+body.notes-off .note{display:none}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--bg);
+  padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:30}
+.toast.show{opacity:.92}
+.disclaimer{font-size:13px;line-height:1.7;color:var(--muted);background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:10px 14px;margin:0 0 12px}
+.hint{color:var(--muted);font-size:13px;text-align:center;margin:0 0 28px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:12px;background:var(--panel)}
+
+@media (max-width:900px){
+  #menuBtn{display:inline-flex}
+  .sidebar{transform:translateX(-100%);transition:transform .25s;z-index:19;width:84%;max-width:320px;box-shadow:2px 0 12px rgba(0,0,0,.15)}
+  body.menu-open .sidebar{transform:none}
+  main{margin-left:0;padding:70px 16px 100px}
+  .topbar .title small,.hide-sm{display:none}
+}
+@media print{.topbar,.sidebar,.progress{display:none} main{margin:0;padding:0}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="btn" id="menuBtn" type="button" aria-label="目录">☰</button>
+  <div class="title">深入理解 AI Infra<small>原文 + 小龙虾解读</small></div>
+  <div class="switch" id="noteSwitch" role="switch" aria-checked="true" tabindex="0" title="快捷键 N">
+    <span>解读</span><span class="track"></span>
+  </div>
+  <button class="btn hide-sm" id="expandAll" type="button">全部展开</button>
+  <button class="btn" id="fontDown" type="button" aria-label="缩小字号">A-</button>
+  <button class="btn" id="fontUp" type="button" aria-label="放大字号">A+</button>
+  <button class="btn" id="themeBtn" type="button" aria-label="切换颜色">◐ <span id="themeName">浅色</span></button>
+</header>
+<div class="progress" id="progress"></div>
+
+<nav class="sidebar" id="sidebar">
+  <!--TOC-->
+  <div class="side-foot">
+    原文：李博杰《深入理解 AI Infra：量化分析与系统设计》，Apache 2.0 许可。
+    <a href="https://github.com/bojieli/ai-infra-book" target="_blank" rel="noopener">GitHub 仓库</a> ·
+    <a href="https://bojieli.github.io/ai-infra-book/" target="_blank" rel="noopener">在线版</a><br><br>
+    橙色框为小龙虾解读（共 <!--NOTE_COUNT--> 段），不属于原书，由 AI 辅助生成。<br>
+    原书版本：<!--SRC_VERSION--><br>
+    公式显示：KaTeX（MIT 许可）。
+  </div>
+</nav>
+
+<main>
+  <div class="content">
+    <div class="disclaimer">
+      <strong>说明：</strong>这是读者自制的学习版，<strong>不是</strong>作者的官方版本，也未经作者审阅。
+      原文来自李博杰《深入理解 AI Infra：量化分析与系统设计》（<a href="https://github.com/bojieli/ai-infra-book" target="_blank" rel="noopener">原书仓库</a>，Apache 2.0 许可），未改动。
+      橙色"小龙虾解读"和橘黄色下划线是另加的，由 AI 辅助生成，可能有错；数字和结论以原书为准。
+    </div>
+    <p class="hint">右上角开关控制全部解读；点橙色框标题可单独收起。快捷键 <kbd>N</kbd> 开关解读。</p>
+    <!--BODY-->
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>/*KATEX_JS*/</script>
+<script>
+(function(){
+  var KEY='aiinfra.reader.';
+  var store={get:function(k,d){try{var v=localStorage.getItem(KEY+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+             set:function(k,v){try{localStorage.setItem(KEY+k,JSON.stringify(v))}catch(e){}}};
+  var root=document.documentElement, body=document.body;
+
+  // 公式
+  document.querySelectorAll('.math').forEach(function(el){
+    try{katex.render(el.textContent,el,{displayMode:el.classList.contains('display'),throwOnError:false,strict:false});}catch(e){}
+  });
+
+  // 主题与字号
+  // 颜色：浅色 → 护眼绿 → 深色，循环切换
+  var THEMES=[['light','浅色'],['green','护眼'],['dark','深色']];
+  var ti=Math.max(0,THEMES.map(function(t){return t[0]}).indexOf(store.get('theme','light')));
+  function setTheme(i){ti=i;root.classList.remove('dark','green');if(THEMES[i][0]!=='light')root.classList.add(THEMES[i][0]);
+    document.getElementById('themeName').textContent=THEMES[i][1];store.set('theme',THEMES[i][0])}
+  setTheme(ti);
+  document.getElementById('themeBtn').onclick=function(){setTheme((ti+1)%THEMES.length);toast('颜色：'+THEMES[ti][1])};
+  var fs=store.get('fs',17); root.style.setProperty('--fs',fs+'px');
+  function setFs(d){fs=Math.min(24,Math.max(13,fs+d));root.style.setProperty('--fs',fs+'px');store.set('fs',fs)}
+  document.getElementById('fontUp').onclick=function(){setFs(1)};
+  document.getElementById('fontDown').onclick=function(){setFs(-1)};
+
+  // 解读总开关
+  var sw=document.getElementById('noteSwitch');
+  function setNotes(on,quiet){body.classList.toggle('notes-off',!on);sw.setAttribute('aria-checked',on);store.set('notes',on);
+    if(!quiet) toast(on?'已打开解读':'已关闭解读，只看原文')}
+  setNotes(store.get('notes',true),true);
+  sw.onclick=function(){setNotes(body.classList.contains('notes-off'))};
+  sw.onkeydown=function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();sw.onclick()}};
+  document.addEventListener('keydown',function(e){
+    if((e.key==='n'||e.key==='N')&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)) sw.onclick();
+  });
+
+  // 单条解读收起
+  var collapsed=store.get('collapsed',{});
+  var notes=document.querySelectorAll('.note');
+  function paint(n){var c=n.classList.contains('collapsed');var h=n.querySelector('.note-head');
+    h.setAttribute('aria-expanded',!c);h.querySelector('.note-arrow').textContent=c?'展开':'收起'}
+  notes.forEach(function(n){
+    if(collapsed[n.dataset.note]) n.classList.add('collapsed');
+    paint(n);
+    n.querySelector('.note-head').onclick=function(){
+      var c=n.classList.toggle('collapsed'); if(c) collapsed[n.dataset.note]=1; else delete collapsed[n.dataset.note];
+      store.set('collapsed',collapsed); paint(n);
+    };
+  });
+  var ex=document.getElementById('expandAll');
+  function syncEx(){ex.textContent=Object.keys(collapsed).length?'全部展开':'全部收起'}
+  syncEx();
+  ex.onclick=function(){
+    var expand=Object.keys(collapsed).length>0; collapsed={};
+    notes.forEach(function(n){n.classList.toggle('collapsed',!expand); if(!expand) collapsed[n.dataset.note]=1; paint(n)});
+    store.set('collapsed',collapsed); syncEx(); if(body.classList.contains('notes-off')) setNotes(true);
+  };
+  notes.forEach(function(n){n.querySelector('.note-head').addEventListener('click',syncEx)});
+
+  // 目录
+  document.getElementById('menuBtn').onclick=function(){body.classList.toggle('menu-open')};
+  var links={}; document.querySelectorAll('.sidebar a[href^="#"]').forEach(function(a){
+    links[a.getAttribute('href').slice(1)]=a; a.addEventListener('click',function(){body.classList.remove('menu-open')});
+  });
+  var heads=[].slice.call(document.querySelectorAll('main h1[id],main h2[id],main h3[id]'));
+  var cur=null;
+  function activate(){
+    var y=window.scrollY+90, best=heads[0];
+    for(var i=0;i<heads.length;i++){ if(heads[i].offsetTop<=y) best=heads[i]; else break; }
+    if(best&&best!==cur){ if(cur&&links[cur.id]) links[cur.id].classList.remove('active');
+      cur=best; var a=links[cur.id]; if(a){a.classList.add('active'); a.scrollIntoView({block:'nearest'})} }
+  }
+
+  // 进度与续读
+  var bar=document.getElementById('progress'), t=null;
+  window.addEventListener('scroll',function(){
+    var h=document.documentElement.scrollHeight-innerHeight; bar.style.width=(h>0?scrollY/h*100:0)+'%';
+    activate(); clearTimeout(t); t=setTimeout(function(){ if(cur) store.set('pos',cur.id) },400);
+  },{passive:true});
+  var pos=store.get('pos',null);
+  if(pos&&!location.hash&&document.getElementById(pos)&&pos!==heads[0].id){
+    setTimeout(function(){document.getElementById(pos).scrollIntoView();toast('已回到上次读到的位置')},120);
+  }
+  activate();
+
+  function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('show');
+    clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show')},1600)}
+})();
+</script>
+</body>
+</html>
