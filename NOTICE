@@ -7,13 +7,15 @@
   Licensed under the Apache License, Version 2.0
 
 本项目对原作品所做的改动（依 Apache License 2.0 第 4(b) 条说明）：
-  1. 原文 Markdown 未作任何文字改动，仅转换为 HTML，并把配图和公式字体内嵌进单个文件。
+  1. 原文 Markdown 未作任何文字改动，仅转换为 HTML：在线版按章拆成多个网页，
+     配图另存为 img/ 下的 SVG（只去掉 metadata 和标签间空白），公式提前排成 HTML；
+     离线版（offline.html）把配图和公式字体内嵌进单个文件。
   2. 在各小节末尾另加"小龙虾解读"（notes/ 目录），由 AI 辅助生成，不属于原作品。
   3. 给原文中部分句子加了下划线标记（notes/ 中的 HIGHLIGHTS），不改变句子本身。
   4. 指向原仓库内文件的相对链接，改为指向原仓库 GitHub 页面的绝对链接。
 
 本项目不是原作者的官方版本，未经原作者审阅或认可。
 
-本项目内嵌 KaTeX（https://katex.org），MIT 许可，
+本项目内嵌 KaTeX（https://katex.org）的样式、字体和脚本，MIT 许可，
 Copyright (c) 2013-2020 Khan Academy and other contributors。
 许可全文见 THIRD_PARTY_LICENSES/KaTeX-LICENSE。
