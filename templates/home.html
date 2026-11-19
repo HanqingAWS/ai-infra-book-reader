@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深入理解 AI Infra · 原文 + 小龙虾解读</title>
+<link rel="stylesheet" href="assets/reader.css">
+<script>/* 先套上颜色和字号，换页时不闪白 */try{var t=JSON.parse(localStorage.getItem('aiinfra.reader.theme')),f=JSON.parse(localStorage.getItem('aiinfra.reader.fs'));if(t&&t!=='light')document.documentElement.className=t;if(f)document.documentElement.style.setProperty('--fs',f+'px')}catch(e){}</script>
+</head>
+<body class="home" data-page="home">
+<header class="topbar">
+  <div class="title">深入理解 AI Infra<small>原文 + 小龙虾解读</small></div>
+  <button class="btn" id="fontDown" type="button" aria-label="缩小字号">A-</button>
+  <button class="btn" id="fontUp" type="button" aria-label="放大字号">A+</button>
+  <button class="btn" id="themeBtn" type="button" aria-label="切换颜色">◐ <span id="themeName">浅色</span></button>
+</header>
+
+<main>
+  <div class="content">
+    <div class="home-head">
+      <h1>深入理解 AI Infra</h1>
+      <p>量化分析与系统设计 · 原文 + 小龙虾解读</p>
+    </div>
+    <a class="resume" id="resume" href="ch00.html" hidden></a>
+    <ol class="chapters"><!--CHAPTERS--></ol>
+    <div class="disclaimer">
+      <strong>说明：</strong>这是读者自制的学习版，<strong>不是</strong>作者的官方版本，也未经作者审阅。
+      原文来自李博杰《深入理解 AI Infra：量化分析与系统设计》（<a href="https://github.com/bojieli/ai-infra-book" target="_blank" rel="noopener">原书仓库</a>，Apache 2.0 许可），未改动。
+      橙色"小龙虾解读"和橘黄色下划线是另加的，由 AI 辅助生成，可能有错；数字和结论以原书为准。
+    </div>
+    <p class="hint">每章一个网页。右上角开关控制全部解读；点橙色框标题可单独收起。快捷键 <kbd>N</kbd> 开关解读。</p>
+    <div class="home-foot">
+      共 <!--CHAPTER_COUNT--> 章，解读 <!--NOTE_COUNT--> 段，重点句 <!--HL_COUNT--> 句。原书版本：<!--SRC_VERSION-->。<br>
+<!--OFFLINE-->
+      原文 © 李博杰，Apache 2.0 许可。公式显示：KaTeX（MIT 许可）。
+      <a href="https://github.com/HanqingAWS/ai-infra-book-reader" target="_blank" rel="noopener">本站源码</a>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="assets/reader.js"></script>
+</body>
+</html>
